@@ -1,9 +1,19 @@
-import {useState} from "react";
+import {FC, useEffect, useState} from "react";
 import CSVTable from "./CSVTable.tsx";
 
-const TextFileReader = () => {
+interface TextFileReaderProps{
+    handleSetFileContent: (content: string) => void;
+}
+
+const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent}) => {
     const [fileContent, setFileContent] = useState<string>(''); // 定義檔案內容的狀態
     const [fileType, setFileType] = useState<string>('');
+
+    useEffect(() => {
+        handleSetFileContent(fileContent);
+    }, [fileContent]);
+
+
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         setFileType(file ? file.type : "");
