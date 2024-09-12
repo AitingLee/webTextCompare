@@ -6,10 +6,11 @@ import FileDropUploader from "./FileDropUploader.tsx";
 interface TextFileReaderProps{
     title: string;
     handleSetFileContent: (content: string) => void;
+    handleSetFileType: (type: string) => void;
     clearSignal: boolean;
 }
 
-const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent, title, clearSignal}) => {
+const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent, title, handleSetFileType, clearSignal}) => {
     const [fileContent, setFileContent] = useState<string>("");
     const [fileType, setFileType] = useState<string>("");
     const [fileName, setFileName] = useState<string>("");
@@ -17,6 +18,7 @@ const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent, title, c
 
     useEffect(() => {
         handleSetFileContent(fileContent);
+        handleSetFileType(fileType);
     }, [fileContent]);
 
     useEffect(() => {
@@ -24,6 +26,7 @@ const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent, title, c
             setFileContent("");
             setFileType("");
             setFileName("");
+            setErrorMsg("");
         }
     }, [clearSignal]);
 
