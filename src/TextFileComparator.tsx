@@ -1,4 +1,4 @@
-import {Button, Divider, Flex, IconButton, Text} from "@chakra-ui/react";
+import {Button, Divider, Flex, IconButton, Text, VStack} from "@chakra-ui/react";
 import TextFileReader from "./TextFileReader.tsx";
 import {useState} from "react";
 import {Change, diffWords} from "diff";
@@ -10,6 +10,7 @@ const TextFileComparator = () => {
     const [diffOutput, setDiffOutput] = useState<Change[]>([]);
     const [diffIndexArray, setDiffIndexArray] = useState<number[]>([]);
     const [currentIndex, setCurrentIndex] = useState<number>(-1);
+    const [clearSignal, setClearSignal] = useState<boolean>(false);
 
     function handleGoCompareClick() {
         const result = diffWords(firstFileText, secondFileText);
@@ -21,6 +22,16 @@ const TextFileComparator = () => {
         setDiffIndexArray(indices);
 
         setCurrentIndex(-1);
+    }
+
+    function handleClear(){
+        setFirstFileText("");
+        setSecondFileText("");
+        setDiffOutput([]);
+        setDiffIndexArray([]);
+        setCurrentIndex(-1);
+        setClearSignal(true); // 發送清除訊號
+        setTimeout(() => setClearSignal(false), 0);
     }
 
     function handlePrevDiffClick() {
@@ -42,23 +53,22 @@ const TextFileComparator = () => {
                   direction={["column", "row"]}
                   justifyContent="space-between"
             >
-                <TextFileReader handleSetFileContent={setFirstFileText} title="First File"/>
-                <TextFileReader handleSetFileContent={setSecondFileText} title="Second File"/>
+                <TextFileReader handleSetFileContent={setFirstFileText} title="First File" clearSignal={clearSignal} />
+                <TextFileReader handleSetFileContent={setSecondFileText} title="Second File" clearSignal={clearSignal} />
             </Flex>
             <Divider/>
             {diffOutput.length > 0 && (
-                <>
+                <VStack w="100%" justify="center">
                     <Flex gap={4} align="center">
                         <Text>{currentIndex === -1 ? "-" : currentIndex + 1} / {diffIndexArray.length}</Text>
                         <IconButton aria-label="prev-index" icon={<ChevronLeftIcon />} onClick={handlePrevDiffClick} />
                         <IconButton aria-label="next-index" icon={<ChevronRightIcon />} onClick={handleNextDiffClick} />
                     </Flex>
-                    <Flex>
+                    <VStack >
                         <pre id="display">
                             {diffOutput.map((change: Change, index: number) => {
                                 const color = change.added ? '#90C2E7' : change.removed ? '#FF5657' : '#EAEAEA';
                                 const isHighlighted = index === (currentIndex === -1 ? -1 : diffIndexArray[currentIndex]);
-
                                 return (
                                     <span
                                         key={index}
@@ -69,8 +79,9 @@ const TextFileComparator = () => {
                                 );
                             })}
                         </pre>
-                    </Flex>
-                </>
+                        <Button onClick={handleClear}>Clear</Button>
+                    </VStack>
+                </VStack>
                 )
             }
         </Flex>
