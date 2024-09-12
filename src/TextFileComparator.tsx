@@ -1,4 +1,4 @@
-import {Button, Flex, IconButton, Text} from "@chakra-ui/react";
+import {Button, Divider, Flex, IconButton, Text} from "@chakra-ui/react";
 import TextFileReader from "./TextFileReader.tsx";
 import {useState} from "react";
 import {Change, diffWords} from "diff";
@@ -36,34 +36,43 @@ const TextFileComparator = () => {
     }
 
     return (
-        <Flex direction="column" align="center" p={10} gap={4}>
-            <Flex justify="space-around" gap={4}>
+        <Flex direction="column" align="center" p={10} gap={5}>
+            <Button onClick={handleGoCompareClick}>Go Compare!</Button>
+            <Flex gap={4} w="100%" wrap="wrap"
+                  direction={["column", "row"]}
+                  justifyContent="space-between"
+            >
                 <TextFileReader handleSetFileContent={setFirstFileText} />
-                <Button onClick={handleGoCompareClick}>Go!</Button>
                 <TextFileReader handleSetFileContent={setSecondFileText} />
             </Flex>
-            <Flex gap={4} align="center">
-                <Text>{currentIndex === -1 ? "-" : currentIndex + 1} / {diffIndexArray.length}</Text>
-                <IconButton aria-label="prev-index" icon={<ChevronLeftIcon />} onClick={handlePrevDiffClick} />
-                <IconButton aria-label="next-index" icon={<ChevronRightIcon />} onClick={handleNextDiffClick} />
-            </Flex>
-            <Flex>
-                <pre id="display">
-                    {diffOutput.map((change: Change, index: number) => {
-                        const color = change.added ? 'green' : change.removed ? 'red' : 'black';
-                        const isHighlighted = index === (currentIndex === -1 ? -1 : diffIndexArray[currentIndex]);
+            <Divider/>
+            {diffOutput.length > 0 && (
+                <>
+                    <Flex gap={4} align="center">
+                        <Text>{currentIndex === -1 ? "-" : currentIndex + 1} / {diffIndexArray.length}</Text>
+                        <IconButton aria-label="prev-index" icon={<ChevronLeftIcon />} onClick={handlePrevDiffClick} />
+                        <IconButton aria-label="next-index" icon={<ChevronRightIcon />} onClick={handleNextDiffClick} />
+                    </Flex>
+                    <Flex>
+                        <pre id="display">
+                            {diffOutput.map((change: Change, index: number) => {
+                                const color = change.added ? '#90C2E7' : change.removed ? '#FF5657' : '#EAEAEA';
+                                const isHighlighted = index === (currentIndex === -1 ? -1 : diffIndexArray[currentIndex]);
 
-                        return (
-                            <span
-                                key={index}
-                                style={{ color: color, backgroundColor: isHighlighted ? "yellow" : "transparent" }}
-                            >
-                                {change.value}
-                            </span>
-                        );
-                    })}
-                </pre>
-            </Flex>
+                                return (
+                                    <span
+                                        key={index}
+                                        style={{ color: color, backgroundColor: isHighlighted ? "#F2D9BB60" : "transparent" }}
+                                    >
+                                        {change.value}
+                                    </span>
+                                );
+                            })}
+                        </pre>
+                    </Flex>
+                </>
+                )
+            }
         </Flex>
     );
 }
