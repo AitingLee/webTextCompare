@@ -42,8 +42,8 @@ const TextFileComparator = () => {
                   direction={["column", "row"]}
                   justifyContent="space-between"
             >
-                <TextFileReader handleSetFileContent={setFirstFileText} />
-                <TextFileReader handleSetFileContent={setSecondFileText} />
+                <TextFileReader handleSetFileContent={setFirstFileText} title="First File"/>
+                <TextFileReader handleSetFileContent={setSecondFileText} title="Second File"/>
             </Flex>
             <Divider/>
             {diffOutput.length > 0 && (

@@ -1,23 +1,27 @@
-import {FC, useEffect, useRef, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import CSVTable from "./CSVTable.tsx";
-import {Button, VStack, Text} from "@chakra-ui/react";
+import {VStack, Text} from "@chakra-ui/react";
+import FileDropUploader from "./FileDropUploader.tsx";
 
 interface TextFileReaderProps{
+    title: string;
     handleSetFileContent: (content: string) => void;
 }
 
-const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent}) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
+const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent, title}) => {
     const [fileContent, setFileContent] = useState<string>("");
     const [fileType, setFileType] = useState<string>("");
     const [fileName, setFileName] = useState<string>("");
+    const [errorMsg, setErrorMsg] = useState<string>("");
 
     useEffect(() => {
         handleSetFileContent(fileContent);
     }, [fileContent]);
 
-    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
+    const handleFileUpload = (files: File[]) => {
+        const file = files[0];
+        setFileContent("");
+        setErrorMsg("");
         setFileType(file ? file.type : "");
         setFileName(file ? file.name : "");
 
@@ -30,14 +34,15 @@ const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent}) => {
             };
             reader.readAsText(file);
         }
+        else {
+            setErrorMsg("Please upload only 1 text file (.txt or .csv)")
+        }
     };
 
     return(
-        <VStack w={["100%","100%", "48%"]} borderColor="white" borderWidth="1px">
-            <input type="file" accept=".txt,.csv" onChange={handleFileUpload} ref={fileInputRef} style={{ display: 'none' }}/>
-            <Button onClick={() => fileInputRef.current?.click()}>
-                Upload File
-            </Button>
+        <VStack w={["100%","100%", "48%"]} p={4} borderColor="white" borderWidth="1px">
+            <Text fontSize="1.25rem" fontWeight={800}>{title}</Text>
+            <FileDropUploader onFileLoaded={handleFileUpload}/>
             {fileContent != "" && (
                 <Text>{fileName}</Text>
             ) }
@@ -46,6 +51,9 @@ const TextFileReader: FC<TextFileReaderProps> = ({handleSetFileContent}) => {
             )}
             {fileType === "text/csv" && (
                 <CSVTable originalText={fileContent}/>
+            )}
+            {errorMsg !== "" && (
+                <Text color="#FF5657">{errorMsg}</Text>
             )}
         </VStack>
     )
